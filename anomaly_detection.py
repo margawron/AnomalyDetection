@@ -23,18 +23,16 @@ basedir = "data/Avenue Dataset/training_videos"
 videos = os.listdir(basedir)
 newsize = (227, 227)
 for video in videos:
-    single_video = []
     cap = cv2.VideoCapture("data/Avenue Dataset/training_videos/{}".format(video)) 
     ret, frame = cap.read()
     while ret:
         image = cv2.cvtColor(frame, cv2.COLOR_RGBA2GRAY)
         image = np.resize(image, newsize)
         image = image * (255.0/image.max())
-        single_video.append(image)
+        videos_buffer.append(image)
         ret, frame = cap.read()
-    videos_buffer.append(single_video)
     cap.release()
-
+    break
 """
     counter = 0
     strideCounter = 0
@@ -50,13 +48,13 @@ for video in videos:
 """
 
 
-from tensorflow.keras.layers import ConvLSTM2D, Conv2D, Conv2DTranspose, Input
+from tensorflow.keras.layers import ConvLSTM2D, Conv2D, Conv2DTranspose, InputLayer
 from tensorflow.keras.layers import BatchNormalization, TimeDistributed, Activation
 from tensorflow.keras.models import Sequential
 
 model = Sequential()
 
-model.add(Input(shape=(10, 227 , 227, 1)))
+model.add(InputLayer(input_shape=(10, 227, 227, 1)))
 
 # pierwsza warstwa
 model.add(TimeDistributed(Conv2D(filters=128, kernel_size=(11,11), strides=(4,4))))
@@ -112,7 +110,6 @@ epochs = 100
 """
 model.fit(
     videos_buffer,
-    steps_per_epoch=492,
     epochs=epochs,
     callbacks=callback_list
 )
