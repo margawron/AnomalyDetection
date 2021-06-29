@@ -1,10 +1,12 @@
-from matplotlib.pyplot import imshow
 import src.lstm_net as lstm_net
 import src.datagen as datagenerator
 
+import os
 
-batch_size = 1
-epochs = 10
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+batch_size = 4
+epochs = 100
 
 image_size = (224,224)
 
@@ -15,8 +17,8 @@ datagen = datagenerator.avenue_datagenerator(batch_size, image_size, True)
 
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-filepath = "weights-improvement-{epoch:02d}-{val_accuracy:.2f}.hdf5"
-checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+filepath = "weights-improvement-{epoch:02d}-{perceptual_distance:.2f}.hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='perceptual_distance', verbose=1, save_best_only=True, mode='min')
 callback_list = [checkpoint]
 
 
@@ -45,10 +47,10 @@ model.compile(optimizer='adam',
     ]
 )
 
-
 model.fit(
     datagen,
     epochs=epochs,
+    steps_per_epoch=5,
     callbacks=callback_list
 )
 
