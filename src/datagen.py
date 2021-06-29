@@ -1,18 +1,49 @@
 
 import glob
-from os import read
 import numpy as np
 import cv2
 
-def avenue_datagenerator(batch_size, image_size, setToTrueIfTraining):
+def avenue_datagenerator(image_size, setToTrueIfTraining):
     src = None
     if setToTrueIfTraining is True:
         src = "data/Avenue Dataset/training_videos/*"
     else:
         src = "data/Avenue Dataset/testing_videos/*"
         
+    import os
+    generated_prefix = ''
+    cwd = os.getcwd()
+    if setToTrueIfTraining:
+        generated_prefix = cwd + '/generated'
+        if not os.path.exists(generated_prefix):
+            os.mkdir(generated_prefix)
+
+        generated_prefix = cwd + '/generated/avenue'
+        if not os.path.exists(generated_prefix):
+            os.mkdir(generated_prefix)
+
+        generated_prefix = cwd + '/generated/avenue/train'
+        if not os.path.exists(generated_prefix):
+            os.mkdir(generated_prefix)
+
+    else:
+        generated_prefix = cwd + '/generated'
+        if not os.path.exists(generated_prefix):
+            os.mkdir(generated_prefix)
+        
+        generated_prefix = cwd + '/generated/avenue'
+        if not os.path.exists(generated_prefix):
+            os.mkdir(generated_prefix)
+        
+        generated_prefix = cwd + '/generated/avenue/test'
+        if not os.path.exists(generated_prefix):
+            os.mkdir(generated_prefix)
+    
     files = glob.glob(src)
+
+
     T = 10
+    counter = 0
     for file in files:
         video = cv2.VideoCapture(file)
         video_frames = []
@@ -27,45 +58,35 @@ def avenue_datagenerator(batch_size, image_size, setToTrueIfTraining):
 
         video.release()
 
-        frame_batches = []
         frame_amount = len(video_frames)
 
-        # generate stride comibnations
+        # generate stride comibnations            
 
         # strides of +1
         for idx in range(frame_amount-T):
             frame_batch = np.array(video_frames[idx:idx+T])
             if len(frame_batch) != T:
                 break
-            frame_batches.append(frame_batch)
+            np.save(generated_prefix + '/stride_1_{}'.format(counter), frame_batch)
+            counter += 1
 
         #strides of +2
         for idx in range(frame_amount//2):
             frame_batch = np.array(video_frames[idx:idx+2*T:2])
             if len(frame_batch) != T:
                 break
-            frame_batches.append(frame_batch)
+            np.save(generated_prefix + '/stride_2_{0}'.format(counter), frame_batch)
+            counter += 1
+
 
         #strides of +3
         for idx in range(frame_amount//3):
             frame_batch = np.array(video_frames[idx:idx+3*T:3])
-            if len(frame_batch) == T:
+            if len(frame_batch) != T:
                 break
-            frame_batches.append(frame_batch)
+            np.save(generated_prefix + '/stride_3_{0}'.format(counter), frame_batch)
+            counter += 1
 
-        #align to strides to have only full batches
-        number_of_batches = len(frame_batches)
-        amount_of_batches_to_drop = number_of_batches % batch_size
-        frame_batches = np.array(frame_batches[:number_of_batches-amount_of_batches_to_drop])
 
-        import random
-        random.shuffle(frame_batches)
-
-        counter = 0
-        return_array = []
-        while counter + batch_size <= len(frame_batches)-1:
-            for i in range(batch_size):
-                return_array.append(frame_batches[counter])
-                counter += 1
-            array = np.array(return_array)
-            yield (array, array)
+avenue_datagenerator((224,224), True)
+avenue_datagenerator((224,224), False)
