@@ -3,7 +3,6 @@ import src.batch_generator as datagenerator
 import numpy as np
 import os
 
-#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 batch_size = 16
 epochs = 100
