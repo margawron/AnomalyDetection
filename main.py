@@ -1,56 +1,45 @@
 import src.lstm_net as lstm_net
 import src.batch_generator as datagenerator
-
+import numpy as np
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-batch_size = 4
+batch_size = 16
 epochs = 100
 
 image_size = (224,224)
 
 model = lstm_net.get_model(image_size)
 
-datagen = datagenerator.generate_from_dir(batch_size, 'generated/avenue/', False)
+datagen = datagenerator.generate_from_dir(batch_size, 'generated/avenue/', True)
 
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-filepath = "weights-improvement-{epoch:02d}-{perceptual_distance:.2f}.hdf5"
-checkpoint = ModelCheckpoint(filepath, monitor='perceptual_distance', verbose=1, save_best_only=True, mode='min')
+filepath = "models/weights-improvement-{epoch:02d}-{loss:.3f}.hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 callback_list = [checkpoint]
-
+# https://github.com/drsagitn/anomaly-detection-and-localization/
 
 model.summary()
 
-from keras import backend as K
-
-def perceptual_distance(y_true, y_pred):
-    y_true *= 255.
-    y_pred *= 255.
-    rmean = (y_true[:, :, :, 0] + y_pred[:, :, :, 0]) / 2
-    r = y_true[:, :, :, 0] - y_pred[:, :, :, 0]
-    g = y_true[:, :, :, 1] - y_pred[:, :, :, 1]
-    b = y_true[:, :, :, 2] - y_pred[:, :, :, 2]
-
-    return K.mean(K.sqrt((((512+rmean)*r*r)/256) + 4*g*g + (((767-rmean)*b*b)/256)))
-
 from tensorflow.keras.losses import mean_squared_error
-from tensorflow.keras.metrics import Accuracy
+from tensorflow.keras import optimizers
 
-model.compile(optimizer='adam', 
-    loss=mean_squared_error, 
-    metrics=[
-        "accuracy",
-        perceptual_distance
-    ]
+sgd = optimizers.SGD(nesterov=True)
+
+model.compile(
+    loss=mean_squared_error,
+    optimizer=sgd
 )
 
-model.fit(
+history = model.fit(
     datagen,
     epochs=epochs,
-    steps_per_epoch=5,
+    steps_per_epoch=64,
     callbacks=callback_list
 )
+
+np.save(os.path.join(os.getcwd(), 'train_profile.npy'), history.history)
 
 model.save("model")

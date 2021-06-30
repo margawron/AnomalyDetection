@@ -15,13 +15,15 @@ def generate_from_dir(batch_size, dir, trueIfTrain):
     max_idx = (amount // batch_size) * batch_size
 
     return_val = []
-
     counter = 0
+
     frame_batches = frame_batches[:max_idx]
     for batch_file in frame_batches:
-        return_val.append(np.load(dir + '/' + batch_file))
+        frame_set = np.load(dir + '/' + batch_file)
+        return_val.append(frame_set)
         counter += 1
-        if counter == 10:
+        if counter == batch_size:
             counter = 0
             converted = np.array(return_val)
+            return_val = []
             yield (converted, converted)
