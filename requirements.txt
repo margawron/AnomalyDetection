@@ -26,8 +26,8 @@ docutils==0.17.1
 duplicity==0.8.19
 fasteners==0.16
 future==0.18.2
-google-api-core==1.28.0
-google-api-python-client==2.5.0
+google-api-core==1.30.0
+google-api-python-client==2.10.0
 google-auth==1.28.1
 google-auth-httplib2==0.1.0
 googleapis-common-protos==1.53.0
@@ -70,7 +70,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==8.2.0
 ply==3.11
-prompt-toolkit==3.0.18
+prompt-toolkit==3.0.19
 protobuf==3.17.3
 ptyprocess==0.7.0
 pwquality==1.4.4

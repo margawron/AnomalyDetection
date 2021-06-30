@@ -87,6 +87,3 @@ def avenue_datagenerator(image_size, setToTrueIfTraining):
             np.save(generated_prefix + '/stride_3_{0}'.format(counter), frame_batch)
             counter += 1
 
-
-avenue_datagenerator((224,224), True)
-avenue_datagenerator((224,224), False)
