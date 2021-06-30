@@ -50,3 +50,5 @@ xcuserdata
 
 cvapr/
 data/
+generated/
+weights-improvement-*
