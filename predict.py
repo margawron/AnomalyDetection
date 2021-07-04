@@ -1,7 +1,5 @@
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
 
 from tensorflow.keras.models import load_model
 import numpy as np
@@ -9,27 +7,25 @@ import numpy as np
 import src.batch_generator as datagenerator
 
 
-batch_size = 16
+test_data_amount = 2
 
-trained_model = load_model("best_model.hdf5")
+trained_model = load_model("trained_model")
 
-datagen = datagenerator.generate_from_dir(batch_size, 'generated/avenue/', False)
-
-filesize = batch_size * 16
+datagen = datagenerator.generate_from_dir(test_data_amount, 'generated/avenue/', False)
 
 X_test = []
-#X_test = HDF5Matrix(filepath, 'data')
-for i in range(filesize):
-    frame_set = next(datagen)
-    X_test.append(frame_set[0])
+frame_set = next(datagen)
+X_test = [*frame_set[0][:]]
 
+X_test = np.array(X_test)
+X_test.reshape((1,-1))
 
 # main function
-result = trained_model.predict(X_test, batch_size)
+result = trained_model.predict(X_test, test_data_amount)
 
-costs = np.zeros(len(X_test))
+costs = np.zeros(test_data_amount)
 
-for j in range(filesize):
+for j in range(test_data_amount):
     costs[j] = np.linalg.norm(np.squeeze(result[j])-np.squeeze(X_test[j]))
 
 score_vid = costs - min(costs)
