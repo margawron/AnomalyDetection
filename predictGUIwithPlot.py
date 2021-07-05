@@ -1,10 +1,14 @@
 # img_viewer.py
 
-from predict_copy import predict
 
-from random import uniform
+from re import X
 import PySimpleGUI as sg
 import os.path
+from predict import predict_fun
+import os
+
+import numpy as np
+
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import PySimpleGUI as sg
@@ -17,15 +21,20 @@ from matplotlib import style
 dataForPlot = []
 fig, ax = plt.subplots()
 matplotlib.use("TkAgg")
+score_vid = []
 
 def animate(i):
+    score_vid = np.load('score_vid.npy')
     xs=[]
     ys=[]
-    for pick in dataForPlot:
-        if len(dataForPlot) > 1:
-            x,y = pick
+    i = 0
+    for pick in score_vid:
+        if len(score_vid) > 1:
+            x = i
+            y = score_vid[i]
             xs.append(x)
             ys.append(y)
+            i+=1
     ax.cla()
     ax.set_title("Anomaly detection plot")
     ax.set_xlabel("Time")
@@ -50,9 +59,9 @@ file_list_column = [
     ],
     [
         sg.T(""), 
-        sg.Text("Choose a model: "), 
+        sg.Text("Choose a folder with model: "), 
         sg.In(size=(25, 1), enable_events=True, key="-MODEL-"), 
-        sg.FileBrowse(key="-MODEL-")
+        sg.FolderBrowse(key="-MODEL-")
     ]
 ]
 # For now will only show the name of the file that was chosen
@@ -88,41 +97,14 @@ while True:
     # Folder name was filled in, make a list of files in the folder
     if event == "-FOLDER-":
         dataLocation = values["-FOLDER-"]
-        '''
-        try:
-            # Get list of files in folder
-            file_list = os.listdir(folder)
-            dataLocation = folder
-            
-        except:
-            file_list = []
-        fnames = [
-            f
-            for f in file_list
-            if os.path.isfile(os.path.join(folder, f))
-            and f.lower().endswith((".hdf5"))
-        ]
-        window["-MODEL-"].update(fnames)
-        '''
+     
     elif event == "-MODEL-":  # A file was chosen from the listbox
         fileLocation = values["-MODEL-"]
-        ###try:
-            ##fileLocation = os.path.join(
-             ##   values["-MODEL-"]
-            ##)
-            #window["-TOUT-"].update(filename)
-            #window["-IMAGE-"].update(filename=filename)
 
-        ###except:
-        ###    pass
     elif event == 'Predict':
-        score_vid = []
-        #------DANEDOWYKRESU--------
-        for z in range(0,30):
-            score_vid = uniform(0, 1)
-            dataForPlot.append((z,score_vid))
-        #score_vid = predict(fileLocation, dataLocation)
-        print(dataLocation, fileLocation)
-
+        
+        #------Function for prediction and generating score for the plot--------
+        predict_fun(fileLocation, dataLocation)
+        
 
 window.close()
