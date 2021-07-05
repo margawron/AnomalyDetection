@@ -52,9 +52,9 @@ sg.theme('DarkAmber')   # Add a touch of color
 # First the window layout in 2 columns
 file_list_column = [
     [
-        sg.Text("Preprocessed dataForPlot folder"),
+        sg.Text("Choose a video file with testing data"),
         sg.In(size=(25, 1), enable_events=True, key="-FOLDER-"),
-        sg.FolderBrowse(),
+        sg.FileBrowse(),
         sg.Button('Predict')
     ],
     [

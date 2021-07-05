@@ -4,26 +4,21 @@ import numpy as np
 import src.batch_generator as datagenerator
 
 def predict_fun(modelFile, dataFile):
-    test_data_amount = 50
 
     trained_model = load_model(modelFile)
 
-    datagen = datagenerator.generate_from_dir(test_data_amount, dataFile, False)
+    datagen = datagenerator.generate_from_file(dataFile, (224,224))
 
-    X_test = []
-    frame_set = next(datagen)
-    X_test = [*frame_set[0][:]]
-
-    X_test = np.array(X_test)
-    X_test.reshape((1,-1))
+    costs = []
 
     # main function
-    result = trained_model.predict(X_test, test_data_amount)
+    for single_batch in datagen:
+        test_data = []
+        test_data.append(np.array(single_batch))
+        test_data = np.array(test_data)
 
-    costs = np.zeros(test_data_amount)
-
-    for j in range(test_data_amount):
-        costs[j] = np.linalg.norm(np.squeeze(result[j])-np.squeeze(X_test[j]))
+        result = trained_model.predict(test_data)
+        costs.append(np.linalg.norm(np.squeeze(result[0])-np.squeeze(test_data)))
 
     score_vid = costs - min(costs)
     score_vid = 1 - (score_vid / max(score_vid))

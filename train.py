@@ -11,7 +11,7 @@ image_size = (224,224)
 
 model = lstm_net.get_model(image_size)
 
-datagen = datagenerator.generate_from_dir(batch_size, 'generated/avenue/', True)
+datagen = datagenerator.generate_from_dir(batch_size, 'generated/avenue/')
 
 from tensorflow.keras.callbacks import ModelCheckpoint
 

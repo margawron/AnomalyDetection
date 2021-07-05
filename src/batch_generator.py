@@ -1,5 +1,6 @@
 
 import numpy as np
+import cv2
 import os
 import random
 
@@ -27,3 +28,20 @@ def generate_from_dir(batch_size, dir, trueIfTrain):
             converted = np.array(return_val)
             return_val = []
             yield (converted, converted)
+
+def generate_from_file(video_file, image_size):
+    video = cv2.VideoCapture(video_file)
+    video_frames = []
+    ret, frame = video.read()
+    while ret:
+        grayscale = cv2.cvtColor(frame, cv2.COLOR_RGBA2GRAY)
+        resized = cv2.resize(grayscale, image_size, interpolation=cv2.INTER_AREA)
+        image = cv2.normalize(resized, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        reshaped = image.reshape(image_size + (1,))
+        video_frames.append(np.array(reshaped))
+        if len(video_frames) == 10:
+            yield video_frames
+            video_frames = video_frames[1:]
+        ret, frame = video.read()
+
+    video.release()
