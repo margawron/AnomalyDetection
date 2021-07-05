@@ -5,9 +5,9 @@ import random
 
 def generate_from_dir(batch_size, dir, trueIfTrain):
     if trueIfTrain:
-        dir = dir + 'train'
+        dir = dir + '/train'
     else: 
-        dir = dir + 'test'
+        dir = dir + '/test'
 
     frame_batches = os.listdir(dir)
     random.shuffle(frame_batches)
