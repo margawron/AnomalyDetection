@@ -5,10 +5,10 @@ from re import X
 import PySimpleGUI as sg
 import os.path
 from predict import predict_fun
+from displayVideo import playVideo
 import os
 
 import numpy as np
-
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import PySimpleGUI as sg
@@ -37,8 +37,8 @@ def animate(i):
             i+=1
     ax.cla()
     ax.set_title("Anomaly detection plot")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Prediction")
+    ax.set_xlabel("Frames")
+    ax.set_ylabel("Score of regularity")
     ax.grid()
     ax.plot(xs,ys)
     plt.plot(xs, ys)      
@@ -55,7 +55,8 @@ file_list_column = [
         sg.Text("Choose a video file with testing data"),
         sg.In(size=(25, 1), enable_events=True, key="-FOLDER-"),
         sg.FileBrowse(),
-        sg.Button('Predict')
+        sg.Button('Predict'),
+        sg.Button('Play Video')
     ],
     [
         sg.T(""), 
@@ -102,9 +103,10 @@ while True:
         fileLocation = values["-MODEL-"]
 
     elif event == 'Predict':
-        
         #------Function for prediction and generating score for the plot--------
         predict_fun(fileLocation, dataLocation)
-        
+    elif event == 'Play Video':
+        #------Function for playing video with anomaly detection--------
+        playVideo(dataLocation)    
 
 window.close()
