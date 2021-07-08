@@ -1,7 +1,3 @@
-"""
-https://github.com/keras-team/keras-io/blob/master/examples/vision/video_classification.py
-https://theailearner.com/2018/10/15/creating-video-from-images-using-opencv-python/
-""" 
 
 from numpy.linalg.linalg import norm
 import tensorflow.keras as keras

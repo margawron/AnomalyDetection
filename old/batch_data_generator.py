@@ -1,6 +1,4 @@
-"""
-https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
-"""
+
 import math
 
 class BatchDataGenerator:

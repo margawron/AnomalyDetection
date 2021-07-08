@@ -18,7 +18,6 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 filepath = "checkpoints/weights-improvement-{epoch:02d}-{loss:.5f}.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 callback_list = [checkpoint]
-# https://github.com/drsagitn/anomaly-detection-and-localization/
 
 model.summary()
 
